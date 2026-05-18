@@ -1,1 +1,1 @@
-ciao
+Studiare il task della Sentiment Analysis sul dataset IMDB Reviews. Individuare una pipeline adeguata per ottenere buone prestazioni su tale dataset, utilizzando approcci neurali (ad esempio RNN o LSTM).
