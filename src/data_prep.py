@@ -156,38 +156,3 @@ def get_imdb_data_loaders(csv_path, max_vocab_size, max_len, batch_size):
     
     print("Dati pronti")
     return train_loader, valid_loader, vocab_size
-
-if __name__ == '__main__':
-    print("--- INIZIO TEST DEL DATALOADER ---")
-    
-    from config import IMDB_CSV, MAX_VOCAB_SIZE, MAX_SEQUENCE_LENGTH, BATCH_SIZE
-    
-    try:
-        train_loader, valid_loader, vocab_size = get_imdb_data_loaders(
-            csv_path=IMDB_CSV,
-            max_vocab_size=MAX_VOCAB_SIZE,
-            max_len=MAX_SEQUENCE_LENGTH,
-            batch_size=BATCH_SIZE
-        )
-        
-        print(f"\n[TEST 1] Vocabolario creato con successo! Dimensione: {vocab_size} (Max atteso: {MAX_VOCAB_SIZE})")
-        
-        X_batch, y_batch = next(iter(train_loader))
-        
-        print("\n[TEST 2] Analisi delle Dimensioni (Shape) del Batch:")
-        print(f" Forma X_batch: {X_batch.shape} --> (Atteso: [{BATCH_SIZE}, {MAX_SEQUENCE_LENGTH}])")
-        print(f" Forma y_batch: {y_batch.shape} --> (Atteso: [{BATCH_SIZE}])")
-        
-        print("\n[TEST 3] Analisi dei Tipi di Dato (Dtype):")
-        print(f" Tipo X_batch: {X_batch.dtype} --> (Atteso: torch.int64 / torch.long)")
-        print(f" Tipo y_batch: {y_batch.dtype} --> (Atteso: torch.float32)")
-        
-        print("\n[TEST 4] Ispezione visiva del primo sample nel batch:")
-        print(" - Etichetta (y):", y_batch[0].item())
-        print(" - Primi 20 token (X):", X_batch[0][:20].tolist())
-        print(" - Ultimi 10 token (verifica padding):", X_batch[0][-10:].tolist())
-        
-        print("\n--- TUTTI I TEST SUPERATI CON SUCCESSO! IL PIPELINE DATI FUNZIONA. ---")
-        
-    except Exception as e:
-        print(f"\n[ERRORE DURANTE IL TEST]: {e}")
