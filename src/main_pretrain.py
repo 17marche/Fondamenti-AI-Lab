@@ -1,8 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import os
 
-from config import *
+from config import (
+    DEVICE, IMDB_CSV, MAX_VOCAB_SIZE, MAX_SEQUENCE_LENGTH, BATCH_SIZE,
+    EMBEDDING_DIM, HIDDEN_DIM, N_LAYERS, BIDIRECTIONAL, DROPOUT, PAD_IDX,
+    LEARNING_RATE, PRETRAIN_EPOCHS, MODEL_SAVE_PATH
+)
 
 from data_prep import get_imdb_data_loaders
 from model import SentimentLSTM
