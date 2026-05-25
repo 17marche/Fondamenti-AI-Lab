@@ -1,4 +1,5 @@
 import torch
+from datetime import datetime
 
 def calculate_accuracy(preds, y, is_binary=True):
     """
@@ -38,7 +39,7 @@ def train_epoch(model, iterator, optimizer, criterion, device, is_binary=True):
     
     model.train()
     
-    for batch in iterator:
+    for i, batch in enumerate(iterator):
         text, labels = batch
         
         text = text.to(device)
@@ -63,6 +64,10 @@ def train_epoch(model, iterator, optimizer, criterion, device, is_binary=True):
         
         epoch_loss += loss.item()
         epoch_acc += acc.item()
+
+        if (i + 1) % 50 == 0:
+            current_time = datetime.now().strftime("%H:%M:%S")
+            print(f"[{current_time}] Batch {i + 1}/{len(iterator)} | Loss: {loss.item():.4f} | Acc: {acc.item():.4f}")
         
     return epoch_loss / len(iterator), epoch_acc / len(iterator)
 
