@@ -50,14 +50,16 @@ def build_vocab(cleaned_texts, max_vocab_size):
     
     # PAD_IDX = 0, UNK_IDX = 1
     word_to_idx = {
-        '<PAD>': 0,
-        '<UNK>': 1
+        '<PAD>': PAD_IDX,
+        '<UNK>': UNK_IDX
     }
     
     # creazione dizionario
-    for idx, (word, count) in enumerate(most_common_words, start=2):
-        word_to_idx[word] = idx
-        
+    next_idx = max(PAD_IDX, UNK_IDX) + 1
+    for idx, (word, count) in enumerate(most_common_words):
+        word_to_idx[word] = next_idx
+        next_idx += 1
+
     return word_to_idx
 
 
@@ -86,7 +88,7 @@ class TextDataset(Dataset):
                 indices.append(self.word_to_idx[word])
             else:
                 # <UNK>
-                indices.append(1) 
+                indices.append(UNK_IDX) 
 
         # se la sequenza è troppo lunga viene troncata
         if len(indices) > self.max_len:
@@ -94,7 +96,7 @@ class TextDataset(Dataset):
         # se la sequenza è più corta viene aggiunto <PAD>
         else:
             padding_length = self.max_len - len(indices)
-            indices = indices + [0] * padding_length
+            indices = indices + [PAD_IDX] * padding_length
 
         # I testi devono essere interi (LongTensor), il layer di Embedding lavora con indici
         x_tensor = torch.tensor(indices, dtype=torch.long)
@@ -113,8 +115,9 @@ def get_imdb_data_loaders(csv_path, max_vocab_size, max_len, batch_size):
     print("Lettura del dataset IMDB")
     df_imdb = pd.read_csv(csv_path)
     
-    # Mappatura delle etichette IMDB a numeri (1.0 e 0.0)
+    # Mappatura e pulizia delle etichette IMDB a numeri (1.0 e 0.0)
     df_imdb['sentiment'] = df_imdb['sentiment'].map({'positive': 1.0, 'negative': 0.0})
+    df_imdb=df_imdb.dropna(subset=['sentiment'])
     
     # Pulizia dei testi IMDB
     print("Pulizia dei testi IMDB")
