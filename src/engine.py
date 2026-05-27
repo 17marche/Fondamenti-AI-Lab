@@ -16,11 +16,9 @@ def calculate_accuracy(preds, y, is_binary=True):
         correct = (rounded_preds == y).float()
         
     else:
-        # 'preds' sono matrici [batch_size, 3].
-        # argmax per trovare l'indice (0, 1 o 2) con valore più alto
-        predicted_classes = preds.argmax(dim=1)
+        probabilities = torch.softmax(preds, dim=1)
         
-        # Confrontiamo le classi previste con le etichette reali
+        predicted_classes = probabilities.argmax(dim=1)
         correct = (predicted_classes == y).float()
 
     # percentuale di risposte corrette

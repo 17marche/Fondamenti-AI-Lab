@@ -71,9 +71,9 @@ def main():
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params:,} (Solo MLP Output)")
 
-    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-3)
+    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-3)
     
-    WARMUP_EPOCHS = 5
+    WARMUP_EPOCHS = 10
     best_warmup_loss = float('inf')
     
     for epoch in range(WARMUP_EPOCHS):
@@ -105,9 +105,9 @@ def main():
     print(f"Parametri addestrabili attivi: {trainable_params_full:,} (Rete Completa)")
 
     # Learning Rate microscopico
-    optimizer_full = optim.Adam(model.parameters(), lr=1e-5)
+    optimizer_full = optim.Adam(model.parameters(), lr=5e-5)
     
-    FINETUNE_EPOCHS = 5
+    FINETUNE_EPOCHS = 10
     best_final_loss = float('inf')
     
     for epoch in range(FINETUNE_EPOCHS):
