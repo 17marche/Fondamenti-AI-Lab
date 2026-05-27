@@ -93,6 +93,42 @@ def main():
     _, warmup_acc = evaluate(model, valid_loader, criterion, DEVICE, is_binary=False)
     print(f"\t-> Validation Accuracy: {warmup_acc * 100:.2f}%")
     print("-----------------------------------------------------------------")
+
+    # Full fine tuning
+    print("\nFULL FINE-TUNING")
+    print("Scongelamento totale della rete (Embedding + Bi-LSTM + MLP)")
+    
+    for param in model.parameters():
+        param.requires_grad = True
+        
+    trainable_params_full = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"Parametri addestrabili attivi: {trainable_params_full:,} (Rete Completa)")
+
+    # Learning Rate microscopico
+    optimizer_full = optim.Adam(model.parameters(), lr=1e-5)
+    
+    FINETUNE_EPOCHS = 5
+    best_final_loss = float('inf')
+    
+    for epoch in range(FINETUNE_EPOCHS):
+        train_loss, train_acc = train_epoch(model, train_loader, optimizer_full, criterion, DEVICE, is_binary=False)
+        valid_loss, valid_acc = evaluate(model, valid_loader, criterion, DEVICE, is_binary=False)
+        
+        print(f"Full Fine-Tuning Epoca {epoch+1:02} | Train Acc: {train_acc*100:.2f}% | Val Acc: {valid_acc*100:.2f}%")
+        
+        if valid_loss < best_final_loss:
+            best_final_loss = valid_loss
+            torch.save(model.state_dict(), MODEL_SAVE_PATH.replace('.pth', '_final_best.pth'))
+
+    # Benchmark finale
+    print("\nValutazione Finale")
+    print(f"\t-> Final Validation Loss: {best_final_loss:.3f}")
+    
+    model.load_state_dict(torch.load(MODEL_SAVE_PATH.replace('.pth', '_final_best.pth'), map_location=DEVICE))
+    _, final_acc = evaluate(model, valid_loader, criterion, DEVICE, is_binary=False)
+    
+    print(f"\t-> Final Validation Accuracy: {final_acc * 100:.2f}%")
+    print("-----------------------------------------------------------------")
     
 if __name__ == '__main__':
     main()
