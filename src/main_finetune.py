@@ -45,9 +45,11 @@ def main():
     
     model = model.to(DEVICE)
     
-    # Nuova Loss Function.
-    # 3 classi -> CrossEntropyLoss.
-    criterion = nn.CrossEntropyLoss().to(DEVICE)
+    # Nuova Loss Function con pesi per bilanciare le classi
+    # Classi: 0 (Neg), 1 (Neu), 2 (Pos)
+    # Distribuzione: ~600 Neg, ~2800 Neu, ~1300 Pos
+    weights = torch.tensor([5.0, 1.0, 2.2], device=DEVICE)
+    criterion = nn.CrossEntropyLoss(weight=weights).to(DEVICE)
 
     # Benchmark di base con pesi casuali
     print("\nValutazione Baseline (MLP casuale)")
@@ -64,14 +66,14 @@ def main():
     for param in model.parameters():
         param.requires_grad = False
         
-    # Scongeliamo SOLO i parametri dell'ultimo livello dell'MLP
-    for param in model.classifier[3].parameters():
+    # Scongeliamo TUTTO il blocco Classifier (MLP)
+    for param in model.classifier.parameters():
         param.requires_grad = True
         
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"Parametri addestrabili attivi: {trainable_params:,} (Solo MLP Output)")
+    print(f"Parametri addestrabili attivi: {trainable_params:,} (Intero blocco MLP)")
 
-    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=5e-3)
+    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-3)
     
     WARMUP_EPOCHS = 10
     best_warmup_loss = float('inf')
@@ -104,10 +106,10 @@ def main():
     trainable_params_full = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params_full:,} (Rete Completa)")
 
-    # Learning Rate microscopico
-    optimizer_full = optim.Adam(model.parameters(), lr=5e-5)
+    # Learning Rate più aggressivo per l'adattamento
+    optimizer_full = optim.Adam(model.parameters(), lr=1e-4)
     
-    FINETUNE_EPOCHS = 10
+    FINETUNE_EPOCHS = 15
     best_final_loss = float('inf')
     
     for epoch in range(FINETUNE_EPOCHS):
