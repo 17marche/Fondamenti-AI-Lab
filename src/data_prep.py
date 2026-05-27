@@ -156,3 +156,45 @@ def get_imdb_data_loaders(csv_path, max_vocab_size, max_len, batch_size):
     
     print("Dati pronti")
     return train_loader, valid_loader, vocab_size
+
+def get_financial_data_loaders(financial_path, imdb_path, max_vocab_size, max_len, batch_size):
+    """
+    Legge il dataset finanziario, mappa le etichette in 3 classi,ricostruisce
+    il vocabolario (identico a quello precedente) e restituisce i DataLoader.
+    """
+    print("Ricostruzione del vocabolario condiviso")
+    
+    df_imdb = pd.read_csv(imdb_path)
+    imdb_texts = [clean_text(text) for text in df_imdb['review'].tolist()]
+    
+    fin_texts = []
+    fin_labels = []
+    
+    label_map = {'negative': 0, 'neutral': 1, 'positive': 2}
+    
+    with open(financial_path, 'r', encoding='latin-1') as f:
+        for line in f:
+            if '@' in line:
+                text_part, label_part = line.strip().split('@')
+                
+                fin_texts.append(clean_text(text_part))
+                fin_labels.append(label_map[label_part.lower()])
+                
+    all_texts = imdb_texts + fin_texts
+    word_to_idx = build_vocab(all_texts, max_vocab_size)
+    
+    print("Suddivisione dei dati Finanziari in Train e Validation")
+    X_train, X_valid, y_train, y_valid = train_test_split(
+        fin_texts, fin_labels, test_size=0.2, random_state=42
+    )
+    
+    # Dataset PyTorch
+    train_dataset = TextDataset(X_train, y_train, word_to_idx, max_len)
+    valid_dataset = TextDataset(X_valid, y_valid, word_to_idx, max_len)
+    
+    # DataLoader
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
+    
+    print(f"Dati Finanziari pronti! Dataset Train: {len(X_train)} frasi, Valid: {len(X_valid)} frasi.")
+    return train_loader, valid_loader, len(word_to_idx)
