@@ -86,7 +86,11 @@ def evaluate(model, iterator, criterion, device, is_binary=True):
             text, labels = batch
             
             text = text.to(device)
-            labels = labels.to(device)
+            
+            if is_binary:
+                labels = labels.float().to(device)
+            else:
+                labels = labels.long().to(device)
             
             predictions = model(text)
             

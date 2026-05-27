@@ -11,7 +11,7 @@ MODEL_SAVE_PATH = os.path.join(BASE_DIR, 'saved_models', 'sentiment_model.pth')
 
 IMDB_CSV = os.path.join(DATA_DIR, 'imdb-dataset.csv')
 FINANCIAL_PHRASEBANK_DIR = os.path.join(DATA_DIR, 'FinancialPhraseBank-v1.0')
-FINANCIAL_DATA = os.path.join(FINANCIAL_PHRASEBANK_DIR, 'Sentences_AllAgree.txt') # Default to AllAgree
+FINANCIAL_DATA = os.path.join(FINANCIAL_PHRASEBANK_DIR, 'Sentences_50Agree.txt')
 
 # Data Preprocessing
 MAX_VOCAB_SIZE = 20000
