@@ -57,6 +57,42 @@ def main():
     print(f"\t-> Baseline Validation Loss: {baseline_loss:.3f}")
     print(f"\t-> Baseline Validation Accuracy: {baseline_acc * 100:.2f}%")
     print("-----------------------------------------------------------------")
+
+    # Congelamento encoder
+    print("Congelamento dei pesi di Embedding e Bi-LSTM")
+    
+    for param in model.parameters():
+        param.requires_grad = False
+        
+    # Scongeliamo SOLO i parametri dell'ultimo livello dell'MLP
+    for param in model.classifier[3].parameters():
+        param.requires_grad = True
+        
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"Parametri addestrabili attivi: {trainable_params:,} (Solo MLP Output)")
+
+    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-3)
+    
+    WARMUP_EPOCHS = 5
+    best_warmup_loss = float('inf')
+    
+    for epoch in range(WARMUP_EPOCHS):
+        train_loss, train_acc = train_epoch(model, train_loader, optimizer_warmup, criterion, DEVICE, is_binary=False)
+        valid_loss, valid_acc = evaluate(model, valid_loader, criterion, DEVICE, is_binary=False)
+        
+        print(f"Warm-up Epoca {epoch+1:02} | Train Acc: {train_acc*100:.2f}% | Val Acc: {valid_acc*100:.2f}%")
+        ì
+        if valid_loss < best_warmup_loss:
+            best_warmup_loss = valid_loss
+            torch.save(model.state_dict(), MODEL_SAVE_PATH.replace('.pth', '_finetuned.pth'))
+
+    # Benchmark post MLp
+    print("\nValutazione Post Warm-up")
+    print(f"\t-> Validation Loss: {best_warmup_loss:.3f}")
+    model.load_state_dict(torch.load(MODEL_SAVE_PATH.replace('.pth', '_finetuned.pth'), map_location=DEVICE))
+    _, warmup_acc = evaluate(model, valid_loader, criterion, DEVICE, is_binary=False)
+    print(f"\t-> Validation Accuracy: {warmup_acc * 100:.2f}%")
+    print("-----------------------------------------------------------------")
     
 if __name__ == '__main__':
     main()
