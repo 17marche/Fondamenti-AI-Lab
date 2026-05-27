@@ -81,7 +81,7 @@ def main():
         valid_loss, valid_acc = evaluate(model, valid_loader, criterion, DEVICE, is_binary=False)
         
         print(f"Warm-up Epoca {epoch+1:02} | Train Acc: {train_acc*100:.2f}% | Val Acc: {valid_acc*100:.2f}%")
-        ì
+        
         if valid_loss < best_warmup_loss:
             best_warmup_loss = valid_loss
             torch.save(model.state_dict(), MODEL_SAVE_PATH.replace('.pth', '_finetuned.pth'))
