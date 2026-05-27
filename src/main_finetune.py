@@ -45,10 +45,9 @@ def main():
     
     model = model.to(DEVICE)
     
-    # Nuova Loss Function con pesi per bilanciare le classi
+    # Pesi più bilanciati (Square Root Balancing) per non penalizzare troppo la classe Neutral
     # Classi: 0 (Neg), 1 (Neu), 2 (Pos)
-    # Distribuzione: ~600 Neg, ~2800 Neu, ~1300 Pos
-    weights = torch.tensor([5.0, 1.0, 2.2], device=DEVICE)
+    weights = torch.tensor([2.8, 1.0, 1.8], device=DEVICE)
     criterion = nn.CrossEntropyLoss(weight=weights).to(DEVICE)
 
     # Benchmark di base con pesi casuali
@@ -73,7 +72,8 @@ def main():
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params:,} (Intero blocco MLP)")
 
-    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-3)
+    # Warm-up più rapido
+    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=2e-3)
     
     WARMUP_EPOCHS = 10
     best_warmup_loss = float('inf')
@@ -106,10 +106,10 @@ def main():
     trainable_params_full = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params_full:,} (Rete Completa)")
 
-    # Learning Rate più aggressivo per l'adattamento
-    optimizer_full = optim.Adam(model.parameters(), lr=1e-4)
+    # LR più alto e Weight Decay per regolarizzare
+    optimizer_full = optim.Adam(model.parameters(), lr=2e-4, weight_decay=1e-5)
     
-    FINETUNE_EPOCHS = 15
+    FINETUNE_EPOCHS = 20
     best_final_loss = float('inf')
     
     for epoch in range(FINETUNE_EPOCHS):
