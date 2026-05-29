@@ -14,6 +14,7 @@ class SentimentLSTM(nn.Module):
         self.hidden_dim = hidden_dim
         self.n_layers = n_layers
         self.bidirectional = bidirectional
+        self.pad_idx = pad_idx
         
         # Encoder (Estrazione Feature)
         
@@ -51,22 +52,27 @@ class SentimentLSTM(nn.Module):
 
     def forward(self, text):
         """
-        Forward Pass attraverso la rete.
+        Forward Pass attraverso la rete con Masked Mean Pooling.
         input shape: [batch_size, seq_len]
         """
+        # Creazione maschera [batch_size, seq_len, 1] per ignorare il padding
+        mask = (text != self.pad_idx).unsqueeze(-1).float()
         
         embedded = self.embedding(text)
         
-        # LSTM
+        # LSTM output: [batch_size, seq_len, hidden_dim * num_directions]
         output, (hidden, cell) = self.lstm(embedded)
         
-        # Concatenazione di Forward + Backward
-        if self.bidirectional:
-            hidden_final = torch.cat((hidden[-2, :, :], hidden[-1, :, :]), dim=1)
-        else:
-            hidden_final = hidden[-1, :, :]
+        # Applichiamo la maschera all'output
+        masked_output = output * mask
+        
+        # Mean Pooling: media degli stati solo sui token reali
+        sum_masked = torch.sum(masked_output, dim=1)
+        num_tokens = torch.sum(mask, dim=1).clamp(min=1e-9)
+        
+        pooled_output = sum_masked / num_tokens
             
         # MLP
-        logits = self.classifier(hidden_final)
+        logits = self.classifier(pooled_output)
         
         return logits

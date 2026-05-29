@@ -98,9 +98,11 @@ def main():
 
     # Full fine tuning
     print("\nFULL FINE-TUNING")
-    print("Scongelamento totale della rete (Embedding + Bi-LSTM + MLP)")
+    print("Scongelamento Selettivo (LSTM + MLP, Embedding rimane congelato)")
     
-    for param in model.parameters():
+    for param in model.lstm.parameters():
+        param.requires_grad = True
+    for param in model.classifier.parameters():
         param.requires_grad = True
         
     trainable_params_full = sum(p.numel() for p in model.parameters() if p.requires_grad)
