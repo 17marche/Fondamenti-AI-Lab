@@ -13,77 +13,77 @@
 
 \begin{document}
 
-\title{Optimizing Bidirectional LSTM for Financial Sentiment Analysis via Cross-Domain Transfer Learning and Structural Regularization}
+\title{Ottimizzazione di una Bi-LSTM per l'Analisi del Sentiment Finanziario tramite Transfer Learning e Regolarizzazione Strutturale}
 
 \author{
-    \IEEEauthorblockN{Marchesi Luca}
-    \IEEEauthorblockA{\textit{Fondamenti dell'intelligenza artificiale} \\
-        Parma, Italy \\
-        luca.marchesi3@studenti.unipr.it}
+    \IEEEauthorblockN{Autore 1}
+    \IEEEauthorblockA{\textit{Laboratorio di Fondamenti di AI} \\
+        Città, Paese \\
+        indirizzo email}
     \and
-    \IEEEauthorblockN{Minei Francesco}
-    \IEEEauthorblockA{\textit{Fondamenti dell'intelligenza artificiale} \\
-        Parma, Italy \\
-        francesco.minei@studenti.unipr.it}
+    \IEEEauthorblockN{Autore 2}
+    \IEEEauthorblockA{\textit{Laboratorio di Fondamenti di AI} \\
+        Città, Paese \\
+        indirizzo email}
 }
 
 \maketitle
 
 \begin{abstract}
-    This paper investigates the optimization of a Bidirectional Long Short-Term Memory (Bi-LSTM) network for sentiment analysis in the financial domain. Leveraging cross-domain transfer learning from the IMDB movie review dataset to the Financial PhraseBank, we address critical challenges such as sequence padding drift and catastrophic forgetting. Our methodology introduces a Masked Mean Pooling architecture combined with discriminative fine-tuning and selective layer freezing. Experimental results demonstrate that a significant reduction in model capacity (90\% fewer parameters) leads to superior generalization, achieving a validation loss of 0.775 and effectively mitigating the overfitting observed in larger architectures.
+Questo studio analizza l'ottimizzazione di una rete Bidirectional Long Short-Term Memory (Bi-LSTM) per l'analisi del sentiment in ambito finanziario. Utilizzando il transfer learning cross-domain dal dataset di recensioni cinematografiche IMDB al Financial PhraseBank, affrontiamo sfide critiche come il padding drift delle sequenze e il catastrophic forgetting. La nostra metodologia introduce un'architettura Masked Mean Pooling combinata con fine-tuning discriminativo e congelamento selettivo dei layer. I risultati sperimentali dimostrano che una significativa riduzione della capacità del modello (90\% di parametri in meno) porta a una generalizzazione superiore, raggiungendo una validation loss di 0,775 e mitigando efficacemente l'overfitting osservato in architetture più complesse.
 \end{abstract}
 
 \begin{IEEEkeywords}
-    Sentiment Analysis, Bi-LSTM, Transfer Learning, Financial NLP, Regularization, Masked Pooling.
+Analisi del Sentiment, Bi-LSTM, Transfer Learning, NLP Finanziario, Regolarizzazione, Masked Pooling.
 \end{IEEEkeywords}
 
-\section{Introduction}
-Sentiment analysis in the financial sector provides critical insights for market prediction and decision-making. However, the scarcity of labeled financial data often necessitates the use of Transfer Learning. In this study, we explore the adaptation of a Bi-LSTM model, pre-trained on the large-scale IMDB dataset, to the specialized Financial PhraseBank dataset. We identify and resolve structural inefficiencies, specifically focusing on the degradation of hidden states due to padding and the propensity of complex models to memorize small-scale training sets.
+\section{Introduzione}
+L'analisi del sentiment nel settore finanziario fornisce informazioni cruciali per la previsione dei mercati e il processo decisionale. Tuttavia, la scarsità di dati finanziari etichettati richiede spesso l'uso del Transfer Learning. In questo studio, esploriamo l'adattamento di un modello Bi-LSTM, pre-addestrato sul dataset IMDB, al dataset specializzato Financial PhraseBank. Identifichiamo e risolviamo inefficienze strutturali, concentrandoci in particolare sulla degradazione degli stati nascosti dovuta al padding e sulla propensione dei modelli complessi a memorizzare dataset di addestramento di piccole dimensioni.
 
-\section{Proposed Methodology}
-Our approach focuses on structural and training-level optimizations to adapt a general-purpose sentiment model to specialized financial texts.
+\section{Metodologia Proposta}
+Il nostro approccio si concentra su ottimizzazioni strutturali e a livello di addestramento per adattare un modello di sentiment generico a testi finanziari specializzati.
 
-\subsection{Architectural Refinement: Masked Mean Pooling}
-Financial sentences are significantly shorter than standard movie reviews, leading to excessive zero-padding. Standard LSTM implementations often suffer from state drift when extracting the last hidden state. We implemented a \textit{Masked Mean Pooling} layer that filters out padding tokens during feature aggregation:
+\subsection{Raffinamento Architetturale: Masked Mean Pooling}
+Le frasi finanziarie sono significativamente più brevi delle recensioni cinematografiche standard, il che porta a un eccessivo zero-padding. Le implementazioni LSTM standard spesso soffrono di derive di stato durante l'estrazione dell'ultimo stato nascosto. Abbiamo implementato un layer di \textit{Masked Mean Pooling} che filtra i token di padding durante l'aggregazione delle feature:
 \begin{equation}
     \text{Features} = \frac{\sum_{t=1}^{L} (h_t \cdot m_t)}{\sum_{t=1}^{L} m_t}
 \end{equation}
-where $h_t$ is the LSTM output at time $t$ and $m_t$ is a binary mask representing non-padding tokens. This ensures the classifier receives a signal uncontaminated by padding noise.
+dove $h_t$ è l'output della LSTM al tempo $t$ e $m_t$ è una maschera binaria che rappresenta i token non di padding. Ciò garantisce che il classificatore riceva un segnale non contaminato dal rumore del padding.
 
-\subsection{Selective Transfer Learning}
-To preserve the linguistic representations learned during pre-training on the IMDB dataset, we employed a selective freezing strategy. During the full fine-tuning phase, the Embedding layer remained frozen, while the LSTM and the MLP head were updated using discriminative learning rates ($10^{-4}$ for LSTM and $10^{-3}$ for MLP head).
+\subsection{Transfer Learning Selettivo}
+Per preservare le rappresentazioni linguistiche apprese durante il pre-addestramento sul dataset IMDB, abbiamo impiegato una strategia di congelamento selettivo. Durante la fase di full fine-tuning, il layer di Embedding è rimasto congelato, mentre la LSTM e la testa MLP sono state aggiornate utilizzando learning rate discriminativi ($10^{-4}$ per la LSTM e $10^{-3}$ per la testa MLP).
 
-\subsection{Optimization: AdamW and Weight Decay}
-We transitioned from standard Adam to AdamW to decouple weight decay from the gradient update. This modification provided more stable regularization, particularly crucial when fine-tuning on a dataset of approximately 4,000 samples where the risk of overfitting is paramount.
+\subsection{Ottimizzazione: AdamW e Weight Decay}
+Siamo passati da Adam standard ad AdamW per disaccoppiare il weight decay dall'aggiornamento del gradiente. Questa modifica ha fornito una regolarizzazione più stabile, particolarmente cruciale durante il fine-tuning su un dataset di circa 4.000 campioni in cui il rischio di overfitting è prioritario.
 
-\section{Experimental Analysis}
-The model was evaluated on the Financial PhraseBank (50\% agreement). Initial tests with a large architecture (2 layers, 256 hidden units) showed extreme overfitting, with training accuracy reaching 99\% while validation accuracy plateaued at 70\%.
+\section{Analisi Sperimentale}
+Il modello è stato valutato sul Financial PhraseBank (accordo al 50\%). I test iniziali con un'architettura complessa (2 layer, 256 unità nascoste) hanno mostrato un overfitting estremo, con l'accuratezza di addestramento che ha raggiunto il 99\% mentre l'accuratezza di validazione si è stabilizzata al 70\%.
 
-By applying \textit{Model Squeezing} (reducing to 1 layer and 128 hidden units), we observed that a smaller hypothesis space forced the network to learn more robust features. As shown in Table \ref{tab:results}, the simplified model achieved a lower validation loss (0.775), proving that for small-scale financial datasets, architectural simplicity is paramount for generalization.
+Applicando il \textit{Model Squeezing} (riduzione a 1 layer e 128 unità nascoste), abbiamo osservato che uno spazio delle ipotesi più piccolo ha costretto la rete ad apprendere feature più robuste. Come mostrato nella Tabella \ref{tab:results}, il modello semplificato ha ottenuto una validation loss inferiore (0,775), dimostrando che per dataset finanziari su piccola scala, la semplicità architettonica è fondamentale per la generalizzazione.
 
 \begin{table}[htbp]
-    \caption{Performance and Complexity Comparison}
-    \begin{center}
-        \begin{tabular}{|l|c|c|c|}
-            \hline
-            \textbf{Architecture}    & \textbf{Parameters} & \textbf{Val. Acc} & \textbf{Val. Loss} \\
-            \hline
-            Bi-LSTM (256x2)          & 2,442,243           & 69.51\%           & 0.784              \\
-            \textbf{Bi-LSTM (128x1)} & \textbf{268,803}    & \textbf{71.50\%}  & \textbf{0.775}     \\
-            \hline
-        \end{tabular}
-        \label{tab:results}
-    \end{center}
+\caption{Confronto delle Prestazioni e della Complessità}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Architettura} & \textbf{Parametri} & \textbf{Val. Acc} & \textbf{Val. Loss} \\
+\hline
+Bi-LSTM (256x2) & 2.442.243 & 69,51\% & 0,784 \\
+\textbf{Bi-LSTM (128x1)} & \textbf{268.803} & \textbf{71,50\%} & \textbf{0,775} \\
+\hline
+\end{tabular}
+\label{tab:results}
+\end{center}
 \end{table}
 
-\section{Conclusion}
-In this study, we demonstrated that optimizing a Bi-LSTM for financial sentiment analysis requires a careful balance between capacity and regularization. Through the implementation of Masked Pooling and AdamW-based weight decay, we successfully stabilized the transfer learning process. Our findings suggest that the 71-72\% accuracy range represents a performance ceiling for recurrent architectures on this dataset; further improvements would likely require attention-based architectures or large-scale language models like FinBERT.
+\section{Conclusioni}
+In questo studio, abbiamo dimostrato che l'ottimizzazione di una Bi-LSTM per l'analisi del sentiment finanziario richiede un attento equilibrio tra capacità e regolarizzazione. Attraverso l'implementazione del Masked Pooling e del weight decay basato su AdamW, abbiamo stabilizzato con successo il processo di transfer learning. I nostri risultati suggeriscono che l'intervallo di accuratezza del 71-72\% rappresenta un limite prestazionale per le architetture ricorrenti su questo dataset; ulteriori miglioramenti richiederebbero probabilmente architetture basate sull'attenzione o modelli linguistici su larga scala come FinBERT.
 
 \begin{thebibliography}{00}
-    \bibitem{b1} S. Hochreiter and J. Schmidhuber, ``Long short-term memory,'' Neural computation, vol. 9, no. 8, pp. 1735--1780, 1997.
-    \bibitem{b2} P. Malo, A. Sinha, P. Korhonen, J. Wallenius, and P. Takala, ``Good debt or bad debt: Detecting semantic orientations in economic texts,'' Journal of the Association for Information Science and Technology, vol. 65, no. 4, pp. 782--796, 2014.
-    \bibitem{b3} I. Loshchilov and F. Hutter, ``Decoupled weight decay regularization,'' in Proc. Int. Conf. Learn. Represent. (ICLR), 2019.
-    \bibitem{b4} A. L. Maas et al., ``Learning word vectors for sentiment analysis,'' in Proc. 49th Annu. Meeting Assoc. Comput. Linguistics, 2011, pp. 142--150.
+\bibitem{b1} S. Hochreiter and J. Schmidhuber, ``Long short-term memory,'' Neural computation, vol. 9, no. 8, pp. 1735--1780, 1997.
+\bibitem{b2} P. Malo, A. Sinha, P. Korhonen, J. Wallenius, and P. Takala, ``Good debt or bad debt: Detecting semantic orientations in economic texts,'' Journal of the Association for Information Science and Technology, vol. 65, no. 4, pp. 782--796, 2014.
+\bibitem{b3} I. Loshchilov and F. Hutter, ``Decoupled weight decay regularization,'' in Proc. Int. Conf. Learn. Represent. (ICLR), 2019.
+\bibitem{b4} A. L. Maas et al., ``Learning word vectors for sentiment analysis,'' in Proc. 49th Annu. Meeting Assoc. Comput. Linguistics, 2011, pp. 142--150.
 \end{thebibliography}
 
 \end{document}
