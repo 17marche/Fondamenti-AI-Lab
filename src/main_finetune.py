@@ -108,9 +108,9 @@ def main():
     trainable_params_full = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params_full:,} (Rete Completa)")
 
-    # Learning Rate Differenziali Ricalibrati con AdamW
+    # Learning Rate Differenziali (Best Setup: LSTM 1e-4 per performance, Classifier 1e-3)
     optimizer_full = optim.AdamW([
-        {'params': filter(lambda p: p.requires_grad, model.lstm.parameters()), 'lr': 5e-5, 'weight_decay': 1e-4},
+        {'params': filter(lambda p: p.requires_grad, model.lstm.parameters()), 'lr': 1e-4, 'weight_decay': 1e-4},
         {'params': filter(lambda p: p.requires_grad, model.classifier.parameters()), 'lr': 1e-3, 'weight_decay': 1e-2}
     ])
     
