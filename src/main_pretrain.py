@@ -38,7 +38,7 @@ def main():
     ).to(DEVICE)
 
     # ottimizzatore e loss
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-2)
     criterion = nn.BCEWithLogitsLoss().to(DEVICE)
 
     # addestramento

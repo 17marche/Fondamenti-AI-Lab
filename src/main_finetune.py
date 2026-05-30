@@ -72,8 +72,8 @@ def main():
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params:,} (Intero blocco MLP)")
 
-    # Warm-up più rapido
-    optimizer_warmup = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=2e-3)
+    # Warm-up più rapido con AdamW
+    optimizer_warmup = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=2e-3, weight_decay=1e-2)
     
     WARMUP_EPOCHS = 10
     best_warmup_loss = float('inf')
@@ -108,11 +108,16 @@ def main():
     trainable_params_full = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params_full:,} (Rete Completa)")
 
-    # LR più alto e Weight Decay per regolarizzare
-    optimizer_full = optim.Adam(model.parameters(), lr=2e-4, weight_decay=1e-5)
+    # Learning Rate Differenziali Ricalibrati con AdamW
+    optimizer_full = optim.AdamW([
+        {'params': filter(lambda p: p.requires_grad, model.lstm.parameters()), 'lr': 5e-5, 'weight_decay': 1e-4},
+        {'params': filter(lambda p: p.requires_grad, model.classifier.parameters()), 'lr': 1e-3, 'weight_decay': 1e-2}
+    ])
     
-    FINETUNE_EPOCHS = 20
+    FINETUNE_EPOCHS = 30
     best_final_loss = float('inf')
+    PATIENCE = 7
+    patience_counter = 0
     
     for epoch in range(FINETUNE_EPOCHS):
         train_loss, train_acc = train_epoch(model, train_loader, optimizer_full, criterion, DEVICE, is_binary=False)
@@ -123,6 +128,13 @@ def main():
         if valid_loss < best_final_loss:
             best_final_loss = valid_loss
             torch.save(model.state_dict(), MODEL_SAVE_PATH.replace('.pth', '_final_best.pth'))
+            patience_counter = 0
+            print(f"\t => Modello salvato (Loss: {valid_loss:.4f})")
+        else:
+            patience_counter += 1
+            if patience_counter >= PATIENCE:
+                print(f"\n[Early Stopping] L'addestramento è stato interrotto all'epoca {epoch+1}")
+                break
 
     # Benchmark finale
     print("\nValutazione Finale")
