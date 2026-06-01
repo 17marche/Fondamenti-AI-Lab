@@ -5,7 +5,6 @@ from collections import Counter
 from sklearn.model_selection import train_test_split
 import re
 
-# Importiamo le costanti dal config
 from config import (PAD_IDX, UNK_IDX, FINANCIAL_DATA)
 
 
@@ -27,7 +26,7 @@ def clean_text(text):
     # gli spazi multipli
     text = re.sub(r'\s+', ' ', text).strip()
     
-    # la stringa pulita -> lista di parole ("the stock went up" -> ['the', 'stock', 'went', 'up'])
+    # stringa pulita -> lista di parole ("the stock went up" -> ['the', 'stock', 'went', 'up'])
     tokens = text.split()
     
     return tokens
@@ -45,7 +44,7 @@ def build_vocab(cleaned_texts, max_vocab_size):
     for tokens in cleaned_texts:
         word_counts.update(tokens)
         
-    # solo le parole più frequenti e sottraiamo 2 (posti sono riservati ai token speciali)
+    # solo le parole più frequenti e sottraiamo 2 (posti riservati ai token speciali)
     most_common_words = word_counts.most_common(max_vocab_size - 2)
     
     # PAD_IDX = 0, UNK_IDX = 1

@@ -10,7 +10,6 @@ class SentimentLSTM(nn.Module):
         
         super(SentimentLSTM, self).__init__()
         
-        # alcune dimensioni utili
         self.hidden_dim = hidden_dim
         self.n_layers = n_layers
         self.bidirectional = bidirectional
@@ -24,7 +23,7 @@ class SentimentLSTM(nn.Module):
             padding_idx=pad_idx
         )
         
-        # Strato Recorrente (Bi-LSTM)
+        # Strato Ricorrente (Bi-LSTM)
         self.lstm = nn.LSTM(
             input_size=embedding_dim, 
             hidden_size=hidden_dim, 

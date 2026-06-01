@@ -19,7 +19,7 @@ def main():
         batch_size=BATCH_SIZE
     )
 
-    # Ripristino modello pre-addestrato (IMDB)
+    # modello pre-addestrato (IMDB)
     print("\nIstanziazione del modello e caricamento pesi da IMDB")
     
     model = SentimentLSTM(
@@ -33,14 +33,14 @@ def main():
         pad_idx=PAD_IDX
     ).to(DEVICE)
     
-    # Carichiamo i pesi salvati
+    # pesi salvati
     model.load_state_dict(torch.load(MODEL_SAVE_PATH, map_location=DEVICE))
     print("Pesi pre-addestrati caricati con successo!")
 
-    # Sostituzione testa MLP (1 -> 3)
+    # sostituzione testa MLP (1 -> 3)
     print("\nSostituzione dell'ultimo strato per la classificazione a 3 classi")
     
-    # Ultimo strato (indice 3) all'interno di nn.Sequential
+    # ultimo strato (indice 3) all'interno di nn.Sequential
     model.classifier[3] = nn.Linear(in_features=HIDDEN_DIM, out_features=FINANCIAL_CLASSES)
     
     model = model.to(DEVICE)
@@ -65,7 +65,7 @@ def main():
     for param in model.parameters():
         param.requires_grad = False
         
-    # Scongeliamo TUTTO il blocco Classifier (MLP)
+    # Scongeliamo tutto l'MLP
     for param in model.classifier.parameters():
         param.requires_grad = True
         
@@ -88,7 +88,7 @@ def main():
             best_warmup_loss = valid_loss
             torch.save(model.state_dict(), MODEL_SAVE_PATH.replace('.pth', '_finetuned.pth'))
 
-    # Benchmark post MLp
+    # Benchmark post MLP
     print("\nValutazione Post Warm-up")
     print(f"\t-> Validation Loss: {best_warmup_loss:.3f}")
     model.load_state_dict(torch.load(MODEL_SAVE_PATH.replace('.pth', '_finetuned.pth'), map_location=DEVICE))
@@ -108,7 +108,7 @@ def main():
     trainable_params_full = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parametri addestrabili attivi: {trainable_params_full:,} (Rete Completa)")
 
-    # Learning Rate Differenziali (Best Setup: LSTM 1e-4 per performance, Classifier 1e-3)
+    # Learning Rate Differenziali (LSTM 1e-4 per performance, Classifier 1e-3)
     optimizer_full = optim.AdamW([
         {'params': filter(lambda p: p.requires_grad, model.lstm.parameters()), 'lr': 1e-4, 'weight_decay': 1e-4},
         {'params': filter(lambda p: p.requires_grad, model.classifier.parameters()), 'lr': 1e-3, 'weight_decay': 1e-2}
