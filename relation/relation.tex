@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-    Questo studio analizza l'ottimizzazione di una rete Bidirectional Long Short-Term Memory (Bi-LSTM) per l'analisi del sentiment in ambito finanziario. Utilizzando il transfer learning dal dataset di recensioni cinematografiche IMDB al Financial PhraseBank, abbiamo sviluppato un'architettura scelta presenta Masked Mean Pooling combinato con fine-tuning e congelamento selettivo dei layer. I risultati dimostrano che una significativa riduzione della dimensione del modello (rispetto alla prima architettura testata) porta a una generalizzazione superiore, raggiungendo una validation loss di 0,775 e mitigando l'overfitting inizialmente osservato.
+    Questo studio analizza l'ottimizzazione di una rete Bidirectional Long Short-Term Memory (Bi-LSTM) per l'analisi del sentiment in ambito finanziario. Utilizzando il transfer learning dal dataset di recensioni cinematografiche IMDB al Financial PhraseBank, l'architettura scelta presenta Masked Mean Pooling combinato con fine-tuning e congelamento selettivo dei layer. I risultati dimostrano che una significativa riduzione della dimensione del modello (rispetto alla prima architettura testata) porta a una generalizzazione superiore, raggiungendo una validation loss di 0,775 e mitigando l'overfitting inizialmente osservato.
 \end{abstract}
 
 \section{Introduzione}
@@ -40,7 +40,7 @@ La scarsa disponibilità di dati finanziari etichettati richiede spesso l'uso de
 Il nostro approccio si concentra sull'adattamento di un modello di sentiment generico a testi finanziari specializzati.
 
 \subsection{Miglioramento architetturale: Masked Mean Pooling}
-Le frasi finanziarie sono significativamente più brevi delle recensioni cinematografiche standard, il che porta a un eccessivo zero-padding. Abbiamo implementato un layer di \textit{Masked Mean Pooling} che filtra i token di padding durante l'estrazione delle feature. Ciò garantisce che il classificatore riceva un segnale non contaminato dal rumore del padding.
+Le frasi finanziarie sono significativamente più brevi delle recensioni cinematografiche, il che porta a un eccessivo zero-padding. Abbiamo implementato un layer di \textit{Masked Mean Pooling} che filtra i token di padding durante l'estrazione delle feature. Ciò garantisce che il classificatore riceva un segnale non contaminato dal rumore del padding.
 
 \subsection{Transfer Learning Selettivo}
 Per preservare le rappresentazioni linguistiche apprese durante il pre-addestramento sul dataset IMDB, i pesi dei vari strati della rete sono stati congelati in maniera selettiva. Durante la fase di fine-tuning, il layer di Embedding è rimasto congelato, mentre la LSTM e la testa MLP sono state aggiornate utilizzando learning rate distinti ($10^{-4}$ per la LSTM e $10^{-3}$ per la testa MLP).
