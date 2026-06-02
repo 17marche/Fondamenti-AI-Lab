@@ -6,7 +6,7 @@ import os
 from config import (
     DEVICE, IMDB_CSV, MAX_VOCAB_SIZE, MAX_SEQUENCE_LENGTH, BATCH_SIZE,
     EMBEDDING_DIM, HIDDEN_DIM, N_LAYERS, BIDIRECTIONAL, DROPOUT, PAD_IDX,
-    LEARNING_RATE, PRETRAIN_EPOCHS, MODEL_SAVE_PATH
+    LEARNING_RATE_PRETRAIN, PRETRAIN_EPOCHS, MODEL_SAVE_PATH
 )
 
 from data_prep import get_imdb_data_loaders
@@ -38,7 +38,7 @@ def main():
     ).to(DEVICE)
 
     # ottimizzatore e loss
-    optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-2)
+    optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE_PRETRAIN, weight_decay=1e-2)
     criterion = nn.BCEWithLogitsLoss().to(DEVICE)
 
     # addestramento

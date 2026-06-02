@@ -75,7 +75,6 @@ def main():
     # Warm-up più rapido con AdamW
     optimizer_warmup = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=2e-3, weight_decay=1e-2)
     
-    WARMUP_EPOCHS = 10
     best_warmup_loss = float('inf')
     
     for epoch in range(WARMUP_EPOCHS):
@@ -114,7 +113,6 @@ def main():
         {'params': filter(lambda p: p.requires_grad, model.classifier.parameters()), 'lr': 1e-3, 'weight_decay': 1e-2}
     ])
     
-    FINETUNE_EPOCHS = 30
     best_final_loss = float('inf')
     PATIENCE = 7
     patience_counter = 0

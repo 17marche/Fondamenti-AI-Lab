@@ -43,7 +43,7 @@ def train_epoch(model, iterator, optimizer, criterion, device, is_binary=True):
         text = text.to(device)
 
         if is_binary:
-                labels = labels.float().to(device)
+            labels = labels.float().to(device)
         else:
             labels = labels.long().to(device)
         

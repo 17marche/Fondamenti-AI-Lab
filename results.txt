@@ -134,7 +134,7 @@ PRIMO MODELLO
                                                                                                                                                                                                                                                                               
    FULL FINE-TUNING                                                                                                                                                                                                                                                           
    Scongelamento Selettivo (LSTM + MLP, Embedding rimane congelato)                                                                                                                                                                                                           
-   Parametri addestrabili attivi: 2,573,315 (Rete Completa)                                                                                                                                                                                                                   
+   Parametri addestrabili attivi: 2.442.243 (Rete Completa)                                                                                                                                                                                                                   
    [16:00:34] Batch 50/61 | Loss: 0.7728 | Acc: 0.7188                                                                                                                                                                                                                        
    Full Fine-Tuning Epoca 01 | Train Acc: 59.57% | Val Acc: 61.31%                                                                                                                                                                                                            
        => Modello salvato (Loss: 0.9444)                                                                                                                                                                                                                                      
@@ -296,100 +296,101 @@ python3 src/main_pretrain.py
    Epoca: 05                                                                                                                                                                                                                                                                  
        Train Loss: 0.094 | Train Acc: 96.96%                                                                                                                                                                                                                                  
        Val. Loss: 0.326 |  Val. Acc: 89.21%                                                                                                                                                                                                                                   
-   fra in Fondamenti-AI-Lab on   main  (.venv)                                                                                                                                                                                                                              
-   ❯ python3 src/main_finetune.py                                                                                                                                                                                                                                             
-   Fine-Tuning su Financial PhraseBank (cuda)                                                                                                                                                                                                                                 
-   Ricostruzione del vocabolario condiviso                                                                                                                                                                                                                                    
-   Suddivisione dei dati Finanziari in Train e Validation                                                                                                                                                                                                                     
-   Dati Finanziari pronti! Dataset Train: 3876 frasi, Valid: 970 frasi.                                                                                                                                                                                                       
-                                                                                                                                                                                                                                                                              
-   Istanziazione del modello e caricamento pesi da IMDB                                                                                                                                                                                                                       
-   /home/fra/Desktop/Code/Fondamenti-AI-Lab/.venv/lib/python3.12/site-packages/torch/nn/modules/rnn.py:1009: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.5 and      
-   num_layers=1                                                                                                                                                                                                                                                               
-     super().__init__("LSTM", *args, **kwargs)                                                                                                                                                                                                                                
-   Pesi pre-addestrati caricati con successo!                                                                                                                                                                                                                                 
-                                                                                                                                                                                                                                                                              
-   Sostituzione dell'ultimo strato per la classificazione a 3 classi                                                                                                                                                                                                          
-                                                                                                                                                                                                                                                                              
-   Valutazione Baseline (MLP casuale)                                                                                                                                                                                                                                         
-       -> Baseline Validation Loss: 1.124                                                                                                                                                                                                                                     
-       -> Baseline Validation Accuracy: 24.36%                                                                                                                                                                                                                                
-   -----------------------------------------------------------------                                                                                                                                                                                                          
-   Congelamento dei pesi di Embedding e Bi-LSTM                                                                                                                                                                                                                               
-   Parametri addestrabili attivi: 33,283 (Intero blocco MLP)                                                                                                                                                                                                                  
-   [16:16:00] Batch 50/61 | Loss: 1.1258 | Acc: 0.4844                                                                                                                                                                                                                        
-   Warm-up Epoca 01 | Train Acc: 51.09% | Val Acc: 61.45%                                                                                                                                                                                                                     
-   [16:16:01] Batch 50/61 | Loss: 0.9794 | Acc: 0.5781                                                                                                                                                                                                                        
-   Warm-up Epoca 02 | Train Acc: 57.66% | Val Acc: 63.24%                                                                                                                                                                                                                     
-   [16:16:01] Batch 50/61 | Loss: 1.0129 | Acc: 0.5938                                                                                                                                                                                                                        
-   Warm-up Epoca 03 | Train Acc: 58.73% | Val Acc: 62.09%                                                                                                                                                                                                                     
-   [16:16:02] Batch 50/61 | Loss: 0.9543 | Acc: 0.6562                                                                                                                                                                                                                        
-   Warm-up Epoca 04 | Train Acc: 60.72% | Val Acc: 61.80%                                                                                                                                                                                                                     
-   [16:16:03] Batch 50/61 | Loss: 0.9762 | Acc: 0.5781                                                                                                                                                                                                                        
-   Warm-up Epoca 05 | Train Acc: 61.14% | Val Acc: 62.38%                                                                                                                                                                                                                     
-   [16:16:03] Batch 50/61 | Loss: 1.0118 | Acc: 0.5625                                                                                                                                                                                                                        
-   Warm-up Epoca 06 | Train Acc: 63.57% | Val Acc: 61.80%                                                                                                                                                                                                                     
-   [16:16:04] Batch 50/61 | Loss: 0.9681 | Acc: 0.5469                                                                                                                                                                                                                        
-   Warm-up Epoca 07 | Train Acc: 62.87% | Val Acc: 64.38%                                                                                                                                                                                                                     
-   [16:16:05] Batch 50/61 | Loss: 0.9689 | Acc: 0.6719                                                                                                                                                                                                                        
-   Warm-up Epoca 08 | Train Acc: 64.50% | Val Acc: 63.01%                                                                                                                                                                                                                     
-   [16:16:05] Batch 50/61 | Loss: 0.9066 | Acc: 0.6562                                                                                                                                                                                                                        
-   Warm-up Epoca 09 | Train Acc: 66.10% | Val Acc: 63.50%                                                                                                                                                                                                                     
-   [16:16:06] Batch 50/61 | Loss: 0.7793 | Acc: 0.6406                                                                                                                                                                                                                        
-   Warm-up Epoca 10 | Train Acc: 66.21% | Val Acc: 64.77%                                                                                                                                                                                                                     
-                                                                                                                                                                                                                                                                              
-   Valutazione Post Warm-up                                                                                                                                                                                                                                                   
-       -> Validation Loss: 0.864                                                                                                                                                                                                                                              
-       -> Validation Accuracy: 64.77%                                                                                                                                                                                                                                         
-   -----------------------------------------------------------------                                                                                                                                                                                                          
-                                                                                                                                                                                                                                                                              
-   FULL FINE-TUNING                                                                                                                                                                                                                                                           
-   Scongelamento Selettivo (LSTM + MLP, Embedding rimane congelato)                                                                                                                                                                                                           
-   Parametri addestrabili attivi: 268,803 (Rete Completa)                                                                                                                                                                                                                     
-   [16:16:07] Batch 50/61 | Loss: 0.8871 | Acc: 0.6562                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 01 | Train Acc: 67.75% | Val Acc: 65.55%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.8466)                                                                                                                                                                                                                                      
-   [16:16:08] Batch 50/61 | Loss: 0.7672 | Acc: 0.7031                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 02 | Train Acc: 69.46% | Val Acc: 66.43%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.8386)                                                                                                                                                                                                                                      
-   [16:16:10] Batch 50/61 | Loss: 0.7279 | Acc: 0.7188                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 03 | Train Acc: 70.13% | Val Acc: 65.84%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.8240)                                                                                                                                                                                                                                      
-   [16:16:11] Batch 50/61 | Loss: 0.7626 | Acc: 0.6875                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 04 | Train Acc: 72.65% | Val Acc: 65.25%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.8124)                                                                                                                                                                                                                                      
-   [16:16:12] Batch 50/61 | Loss: 0.7544 | Acc: 0.7344                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 05 | Train Acc: 73.12% | Val Acc: 64.86%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.8059)                                                                                                                                                                                                                                      
-   [16:16:13] Batch 50/61 | Loss: 0.6602 | Acc: 0.7188                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 06 | Train Acc: 74.33% | Val Acc: 65.84%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.7942)                                                                                                                                                                                                                                      
-   [16:16:15] Batch 50/61 | Loss: 0.5673 | Acc: 0.8125                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 07 | Train Acc: 75.94% | Val Acc: 64.73%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.7873)                                                                                                                                                                                                                                      
-   [16:16:16] Batch 50/61 | Loss: 0.6288 | Acc: 0.7188                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 08 | Train Acc: 77.05% | Val Acc: 66.58%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.7827)                                                                                                                                                                                                                                      
-   [16:16:17] Batch 50/61 | Loss: 0.5710 | Acc: 0.7656                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 09 | Train Acc: 78.06% | Val Acc: 67.56%                                                                                                                                                                                                            
-       => Modello salvato (Loss: 0.7751)                                                                                                                                                                                                                                      
-   [16:16:18] Batch 50/61 | Loss: 0.5094 | Acc: 0.8281                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 10 | Train Acc: 79.32% | Val Acc: 66.97%                                                                                                                                                                                                            
-   [16:16:19] Batch 50/61 | Loss: 0.4849 | Acc: 0.7969                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 11 | Train Acc: 81.18% | Val Acc: 68.67%                                                                                                                                                                                                            
-   [16:16:21] Batch 50/61 | Loss: 0.4013 | Acc: 0.8281                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 12 | Train Acc: 83.46% | Val Acc: 69.84%                                                                                                                                                                                                            
-   [16:16:22] Batch 50/61 | Loss: 0.4954 | Acc: 0.7500                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 13 | Train Acc: 84.69% | Val Acc: 70.14%                                                                                                                                                                                                            
-   [16:16:23] Batch 50/61 | Loss: 0.2671 | Acc: 0.9688                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 14 | Train Acc: 85.48% | Val Acc: 69.26%                                                                                                                                                                                                            
-   [16:16:24] Batch 50/61 | Loss: 0.2754 | Acc: 0.8750                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 15 | Train Acc: 86.93% | Val Acc: 70.23%                                                                                                                                                                                                            
-   [16:16:25] Batch 50/61 | Loss: 0.3586 | Acc: 0.8438                                                                                                                                                                                                                        
-   Full Fine-Tuning Epoca 16 | Train Acc: 87.87% | Val Acc: 71.50%                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                              
-   [Early Stopping] L'addestramento è stato interrotto all'epoca 16                                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                              
-   Valutazione Finale                                                                                                                                                                                                                                                         
-       -> Final Validation Loss: 0.775                                                                                                                                                                                                                                        
-       -> Final Validation Accuracy: 67.56%
+❯ python3 src/main_finetune.py 
+Fine-Tuning su Financial PhraseBank (cuda)
+Ricostruzione del vocabolario condiviso
+Suddivisione dei dati Finanziari in Train e Validation
+Dati Finanziari pronti! Dataset Train: 3876 frasi, Valid: 970 frasi.
+
+Istanziazione del modello e caricamento pesi da IMDB
+/home/fra/Desktop/Code/Fondamenti-AI-Lab/.venv/lib/python3.12/site-packages/torch/nn/modules/rnn.py:1009: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.5 and num_layers=1
+  super().__init__("LSTM", *args, **kwargs)
+Pesi pre-addestrati caricati con successo!
+
+Sostituzione dell'ultimo strato per la classificazione a 3 classi
+
+Valutazione Baseline (MLP casuale)
+	-> Baseline Validation Loss: 1.177
+	-> Baseline Validation Accuracy: 11.04%
+-----------------------------------------------------------------
+Congelamento dei pesi di Embedding e Bi-LSTM
+Parametri addestrabili attivi: 33,283 (Intero blocco MLP)
+[12:38:56] Batch 50/61 | Loss: 0.9901 | Acc: 0.6250
+Warm-up Epoca 01 | Train Acc: 49.88% | Val Acc: 59.98%
+[12:38:57] Batch 50/61 | Loss: 1.0598 | Acc: 0.6406
+Warm-up Epoca 02 | Train Acc: 57.99% | Val Acc: 60.76%
+[12:38:58] Batch 50/61 | Loss: 0.9606 | Acc: 0.5781
+Warm-up Epoca 03 | Train Acc: 58.29% | Val Acc: 63.69%
+[12:38:59] Batch 50/61 | Loss: 0.9942 | Acc: 0.5312
+Warm-up Epoca 04 | Train Acc: 60.72% | Val Acc: 64.80%
+[12:38:59] Batch 50/61 | Loss: 0.9623 | Acc: 0.6250
+Warm-up Epoca 05 | Train Acc: 60.55% | Val Acc: 62.97%
+[12:39:00] Batch 50/61 | Loss: 0.9332 | Acc: 0.5625
+Warm-up Epoca 06 | Train Acc: 62.01% | Val Acc: 65.49%
+[12:39:01] Batch 50/61 | Loss: 0.8405 | Acc: 0.6562
+Warm-up Epoca 07 | Train Acc: 62.67% | Val Acc: 63.26%
+[12:39:01] Batch 50/61 | Loss: 0.8913 | Acc: 0.6562
+Warm-up Epoca 08 | Train Acc: 63.45% | Val Acc: 61.52%
+[12:39:02] Batch 50/61 | Loss: 0.8784 | Acc: 0.6562
+Warm-up Epoca 09 | Train Acc: 63.18% | Val Acc: 60.68%
+[12:39:03] Batch 50/61 | Loss: 0.8944 | Acc: 0.6406
+Warm-up Epoca 10 | Train Acc: 64.27% | Val Acc: 64.14%
+
+Valutazione Post Warm-up
+	-> Validation Loss: 0.874
+	-> Validation Accuracy: 64.14%
+-----------------------------------------------------------------
+
+FULL FINE-TUNING
+Scongelamento Selettivo (LSTM + MLP, Embedding rimane congelato)
+Parametri addestrabili attivi: 268,803 (Rete Completa)
+[12:39:04] Batch 50/61 | Loss: 0.7613 | Acc: 0.7344
+Full Fine-Tuning Epoca 01 | Train Acc: 65.66% | Val Acc: 64.67%
+	=> Modello salvato (Loss: 0.8607)
+[12:39:05] Batch 50/61 | Loss: 0.9445 | Acc: 0.6094
+Full Fine-Tuning Epoca 02 | Train Acc: 67.12% | Val Acc: 64.96%
+	=> Modello salvato (Loss: 0.8476)
+[12:39:07] Batch 50/61 | Loss: 0.7281 | Acc: 0.7188
+Full Fine-Tuning Epoca 03 | Train Acc: 69.38% | Val Acc: 64.86%
+	=> Modello salvato (Loss: 0.8369)
+[12:39:08] Batch 50/61 | Loss: 1.0283 | Acc: 0.5938
+Full Fine-Tuning Epoca 04 | Train Acc: 69.40% | Val Acc: 66.91%
+	=> Modello salvato (Loss: 0.8245)
+[12:39:09] Batch 50/61 | Loss: 0.7472 | Acc: 0.7812
+Full Fine-Tuning Epoca 05 | Train Acc: 71.04% | Val Acc: 67.21%
+	=> Modello salvato (Loss: 0.8063)
+[12:39:10] Batch 50/61 | Loss: 0.6297 | Acc: 0.7344
+Full Fine-Tuning Epoca 06 | Train Acc: 72.16% | Val Acc: 68.54%
+	=> Modello salvato (Loss: 0.7973)
+[12:39:12] Batch 50/61 | Loss: 0.6534 | Acc: 0.7812
+Full Fine-Tuning Epoca 07 | Train Acc: 73.88% | Val Acc: 68.18%
+	=> Modello salvato (Loss: 0.7914)
+[12:39:13] Batch 50/61 | Loss: 0.6361 | Acc: 0.7812
+Full Fine-Tuning Epoca 08 | Train Acc: 75.61% | Val Acc: 67.17%
+	=> Modello salvato (Loss: 0.7859)
+[12:39:14] Batch 50/61 | Loss: 0.4880 | Acc: 0.7656
+Full Fine-Tuning Epoca 09 | Train Acc: 75.90% | Val Acc: 69.26%
+	=> Modello salvato (Loss: 0.7839)
+[12:39:16] Batch 50/61 | Loss: 0.4663 | Acc: 0.8438
+Full Fine-Tuning Epoca 10 | Train Acc: 77.84% | Val Acc: 69.71%
+	=> Modello salvato (Loss: 0.7774)
+[12:39:17] Batch 50/61 | Loss: 0.6260 | Acc: 0.7969
+Full Fine-Tuning Epoca 11 | Train Acc: 79.37% | Val Acc: 70.29%
+[12:39:18] Batch 50/61 | Loss: 0.5966 | Acc: 0.7812
+Full Fine-Tuning Epoca 12 | Train Acc: 80.60% | Val Acc: 68.14%
+[12:39:19] Batch 50/61 | Loss: 0.4655 | Acc: 0.7969
+Full Fine-Tuning Epoca 13 | Train Acc: 81.85% | Val Acc: 69.80%
+[12:39:21] Batch 50/61 | Loss: 0.3072 | Acc: 0.8750
+Full Fine-Tuning Epoca 14 | Train Acc: 82.70% | Val Acc: 69.90%
+[12:39:22] Batch 50/61 | Loss: 0.3095 | Acc: 0.8594
+Full Fine-Tuning Epoca 15 | Train Acc: 84.86% | Val Acc: 72.13%
+[12:39:23] Batch 50/61 | Loss: 0.3476 | Acc: 0.8594
+Full Fine-Tuning Epoca 16 | Train Acc: 85.73% | Val Acc: 71.89%
+[12:39:24] Batch 50/61 | Loss: 0.2744 | Acc: 0.9062
+Full Fine-Tuning Epoca 17 | Train Acc: 87.24% | Val Acc: 70.53%
+
+[Early Stopping] L'addestramento è stato interrotto all'epoca 17
+
+Valutazione Finale
+	-> Final Validation Loss: 0.777
+	-> Final Validation Accuracy: 69.71%

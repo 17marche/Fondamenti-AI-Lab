@@ -1,0 +1,133 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+
+% Pacchetti necessari
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+% Informazioni Titolo
+\title[Sentiment Analysis Bi-LSTM]{Sentiment Analysis finanziario tramite Bi-LSTM: pre-train e fine-tuning}
+\author[Marchesi, Minei]{Marchesi Luca \and Minei Francesco}
+\institute[UniPR]{Università di Parma \\ Laboratorio di Fondamenti di AI}
+\date{03 Giugno 2026}
+
+\begin{document}
+
+% Slide del Titolo
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Slide 1: Obiettivo
+\begin{frame}{Obiettivo del progetto}
+    \begin{itemize}
+        \item \textbf{Task:} Classificazione del sentiment in testi finanziari (Positive, Neutral, Negative).
+        \item \textbf{Dataset target:} \textit{Financial PhraseBank} (circa 4.800 frasi etichettate con 50\% agree).
+        \item \textbf{Sfida principale:} Scarsità di dati nel dominio specifico vs complessità del linguaggio economico.
+        \item \textbf{Strategia:} \textit{Transfer learning e fine-tuning}.
+              \begin{itemize}
+                  \item Pre-addestramento su \textbf{IMDB Reviews} (50k campioni).
+                  \item Fine-tuning sul dominio finanziario.
+              \end{itemize}
+    \end{itemize}
+\end{frame}
+
+% Slide 2: Architettura Base
+\begin{frame}{Architettura del modello}
+    \begin{block}{Encoder: Bi-LSTM}
+        Rete neurale ricorrente bidirezionale per catturare il contesto da entrambi i lati.
+    \end{block}
+    \begin{block}{Classifier: MLP}
+        Testa di classificazione con ReLU e Dropout per la decisione finale.
+    \end{block}
+    \begin{itemize}
+        \item \textbf{Vocabolario:} 20.000 token condivisi tra i due dataset.
+        \item \textbf{Embedding:} 100 dimensioni, pre-addestrato su IMDB.
+    \end{itemize}
+\end{frame}
+
+% Slide 3: Il Problema del Padding Drift
+\begin{frame}{Problema tecnico: eccessivo padding}
+    \begin{itemize}
+        \item Le frasi finanziarie sono brevi ($\sim$20 parole), ma il buffer è fisso a 256 token.
+        \item \textbf{Problematica:} L'estrazione dell'ultimo stato nascosto ($h_{256}$) è \textit{contaminata} da centinaia di token di padding.
+        \item \textbf{Soluzione:} \textit{Masked Mean Pooling}.
+    \end{itemize}
+    \begin{exampleblock}{Formula}
+        \[ Features = \frac{\sum (h_t \cdot m_t)}{\sum m_t} \]
+        Dove $m_t$ è una maschera binaria che ignora i token di padding.
+    \end{exampleblock}
+\end{frame}
+
+% Slide 4: Strategia di Fine-Tuning
+\begin{frame}{Fine-tuning e regolarizzazione}
+    Per evitare l'overfitting:
+    \begin{enumerate}
+        \item \textbf{Layer freezing:} Embedding congelato per preservare le basi linguistiche di IMDB.
+        \item \textbf{Learning rate differenti:}
+              \begin{itemize}
+                  \item LSTM: $10^{-4}$ (adattamento lento).
+                  \item MLP: $10^{-3}$ (apprendimento veloce).
+              \end{itemize}
+        \item \textbf{Ottimizzatore AdamW:} Disaccoppiamento del Weight Decay per regolarizzazione L2 più stabile.
+        \item \textbf{Class weights:} Bilanciamento delle classi tramite \textit{Square Root Balancing}.
+    \end{enumerate}
+\end{frame}
+
+% Slide 5: Analisi Sperimentale - Overfitting
+\begin{frame}{Analisi sperimentale e capacità dei modelli}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{Rete Grande (256x2)}
+        \begin{itemize}
+            \item 2.44M Parametri.
+            \item Train Acc: 99\%.
+            \item Val Acc: 69\%.
+            \item \alert{Overfitting Critico:} La rete memorizza il training set invece di imparare pattern generali.
+        \end{itemize}
+
+        \column{0.5\textwidth}
+        \textbf{Rete Semplificata (128x1)}
+        \begin{itemize}
+            \item 268k Parametri ($-90\%$).
+            \item \textbf{Model Squeezing:} La minor capacità forza la rete a generalizzare.
+            \item Risultati più stabili e Loss ridotta.
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+% Slide 6: Risultati Finali
+\begin{frame}{Confronto Risultati}
+    \begin{table}[]
+        \centering
+        \begin{tabular}{|l|c|c|c|}
+            \hline
+            \textbf{Architettura}    & \textbf{Parametri} & \textbf{Val. Acc} & \textbf{Val. Loss} \\
+            \hline
+            Bi-LSTM (256x2)          & 2.442.243          & 69,51\%           & 0,784              \\
+            \textbf{Bi-LSTM (128x1)} & \textbf{268.803}   & \textbf{69.71\%}  & \textbf{0,777}     \\
+            \hline
+        \end{tabular}
+        \label{tab:results}
+        \caption{Risultati delle due architetture testate}
+    \end{table}
+    \begin{itemize}
+        \item La versione semplificata ottiene la \textbf{miglior generalizzazione}.
+        \item La loss (0.775) dell'architettura semplificata risulta inferiore.
+    \end{itemize}
+\end{frame}
+
+% Slide 7: Conclusioni
+\begin{frame}{Conclusioni e Sviluppi Futuri}
+    \begin{itemize}
+        \item Risulta evidente che su dataset piccoli architetture meno complesse generalizzano meglio.
+        \item Il \textit{Masked Pooling} è essenziale per gestire sequenze di lunghezza variabile.
+        \item \textbf{Limite architetturale:} La Bi-LSTM raggiunge un tetto fisiologico del $\sim$70\% su questo dataset di piccole dimensioni.
+        \item \textbf{Sviluppi:} Passaggio ad architetture \textit{Transformer} (FinBERT) per catturare relazioni semantiche più complesse.
+    \end{itemize}
+\end{frame}
+
+\end{document}
