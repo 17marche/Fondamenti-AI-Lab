@@ -1,25 +1,32 @@
-import torch
+"""Configuration parameters and path definitions for the sentiment analysis pipeline.
+
+This module centralizes system configurations, dataset paths, text preprocessing
+settings, model architecture parameters, and training hyper-parameters for both
+IMDb pre-training and Financial PhraseBank fine-tuning stages.
+"""
+
 import os
+import torch
 
-# Device configuration
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# Compute device selection
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Paths
+# Directory and File Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(BASE_DIR, 'data')
-MODEL_SAVE_PATH = os.path.join(BASE_DIR, 'saved_models', 'sentiment_model.pth')
+DATA_DIR = os.path.join(BASE_DIR, "data")
+MODEL_SAVE_PATH = os.path.join(BASE_DIR, "saved_models", "sentiment_model.pth")
 
-IMDB_CSV = os.path.join(DATA_DIR, 'imdb-dataset.csv')
-FINANCIAL_PHRASEBANK_DIR = os.path.join(DATA_DIR, 'FinancialPhraseBank-v1.0')
-FINANCIAL_DATA = os.path.join(FINANCIAL_PHRASEBANK_DIR, 'Sentences_50Agree.txt')
+IMDB_CSV = os.path.join(DATA_DIR, "imdb-dataset.csv")
+FINANCIAL_PHRASEBANK_DIR = os.path.join(DATA_DIR, "FinancialPhraseBank-v1.0")
+FINANCIAL_DATA = os.path.join(FINANCIAL_PHRASEBANK_DIR, "Sentences_50Agree.txt")
 
-# Data Preprocessing
+# Text Preprocessing & Vocabulary Parameters
 MAX_VOCAB_SIZE = 20000
 MAX_SEQUENCE_LENGTH = 256
 PAD_IDX = 0
 UNK_IDX = 1
 
-# Model Hyperparameters
+# Model Architecture Parameters
 EMBEDDING_DIM = 100
 HIDDEN_DIM = 128
 N_LAYERS = 1
@@ -33,5 +40,5 @@ WARMUP_EPOCHS = 10
 FINETUNE_EPOCHS = 30
 LEARNING_RATE_PRETRAIN = 1e-3
 
-# Classes
-FINANCIAL_CLASSES = 3 # negative, neutral, positive
+# Classification Parameters
+FINANCIAL_CLASSES = 3  # Negative (0), Neutral (1), Positive (2)

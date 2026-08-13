@@ -1,108 +1,142 @@
-import torch
-from datetime import datetime
+"""Training and evaluation step routines for PyTorch neural network execution."""
 
-def calculate_accuracy(preds, y, is_binary=True):
-    """
-    Calcola l'accuratezza del modello.
-    Gestisce sia per la classificazione binaria
-    che per quella multiclasse tramite il flag 'is_binary'.
+from datetime import datetime
+from typing import Tuple
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+
+
+def calculate_accuracy(
+    preds: torch.Tensor, y: torch.Tensor, is_binary: bool = True
+) -> torch.Tensor:
+    """Calculates accuracy metric for binary or multiclass predictions.
+
+    Args:
+        preds: Raw model output logits.
+        y: Ground truth target labels.
+        is_binary: If True, treats task as binary classification; otherwise, multiclass.
+
+    Returns:
+        torch.Tensor: Scalar accuracy value as a floating point tensor.
     """
     if is_binary:
-        # 'preds' sono logits. 
-        # sigmoide per schiacciarli tra 0 e 1
-        # Arrotondiamo: >= 0.5 positivo, < 0.5 diventa negativo
         rounded_preds = torch.round(torch.sigmoid(preds))
-        
         correct = (rounded_preds == y).float()
-        
     else:
         probabilities = torch.softmax(preds, dim=1)
-        
         predicted_classes = probabilities.argmax(dim=1)
         correct = (predicted_classes == y).float()
 
-    # percentuale di risposte corrette
     acc = correct.sum() / len(correct)
-    
     return acc
 
-def train_epoch(model, iterator, optimizer, criterion, device, is_binary=True):
+
+def train_epoch(
+    model: nn.Module,
+    iterator: DataLoader,
+    optimizer: torch.optim.Optimizer,
+    criterion: nn.Module,
+    device: torch.device,
+    is_binary: bool = True,
+) -> Tuple[float, float]:
+    """Executes a single training epoch over the dataset iterator.
+
+    Args:
+        model: PyTorch SentimentLSTM model instance.
+        iterator: DataLoader yielding batch tuples of (text, labels).
+        optimizer: PyTorch optimizer instance.
+        criterion: Loss function module.
+        device: Device execution target (CUDA or CPU).
+        is_binary: Flag indicating binary classification mode.
+
+    Returns:
+        Tuple[float, float]: Mean loss and mean accuracy over the epoch.
     """
-    Esegue un'intera epoca di addestramento.
-    calcola la loss, aggiorna i pesi
-    e restituisce la loss e l'accuratezza medie dell'epoca.
-    """
-    epoch_loss = 0
-    epoch_acc = 0
-    
+    epoch_loss = 0.0
+    epoch_acc = 0.0
+
     model.train()
-    
+
     for i, batch in enumerate(iterator):
         text, labels = batch
-        
         text = text.to(device)
 
         if is_binary:
             labels = labels.float().to(device)
         else:
             labels = labels.long().to(device)
-        
+
         optimizer.zero_grad()
-        
+
         predictions = model(text)
-        
+
         if is_binary:
-            # Il modello produce una shape [64, 1]. Le label reali sono di forma [64].
-            # .squeeze(1) trasforma [64, 1] in [64].
             predictions = predictions.squeeze(1)
-        
+
         loss = criterion(predictions, labels)
-        
         acc = calculate_accuracy(predictions, labels, is_binary)
-        
+
         loss.backward()
-        
         optimizer.step()
-        
+
         epoch_loss += loss.item()
         epoch_acc += acc.item()
 
         if (i + 1) % 50 == 0:
             current_time = datetime.now().strftime("%H:%M:%S")
-            print(f"[{current_time}] Batch {i + 1}/{len(iterator)} | Loss: {loss.item():.4f} | Acc: {acc.item():.4f}")
-        
+            print(
+                f"[{current_time}] Batch {i + 1}/{len(iterator)} | "
+                f"Loss: {loss.item():.4f} | Acc: {acc.item():.4f}"
+            )
+
     return epoch_loss / len(iterator), epoch_acc / len(iterator)
 
-def evaluate(model, iterator, criterion, device, is_binary=True):
+
+def evaluate(
+    model: nn.Module,
+    iterator: DataLoader,
+    criterion: nn.Module,
+    device: torch.device,
+    is_binary: bool = True,
+) -> Tuple[float, float]:
+    """Evaluates the model on validation or test dataset iterator.
+
+    Args:
+        model: PyTorch SentimentLSTM model instance.
+        iterator: DataLoader yielding batch tuples of (text, labels).
+        criterion: Loss function module.
+        device: Device execution target (CUDA or CPU).
+        is_binary: Flag indicating binary classification mode.
+
+    Returns:
+        Tuple[float, float]: Mean validation loss and accuracy.
     """
-    Esegue un'epoca di validazione o test.
-    """
-    epoch_loss = 0
-    epoch_acc = 0
-    
+    epoch_loss = 0.0
+    epoch_acc = 0.0
+
     model.eval()
-    
+
     with torch.no_grad():
-        
         for batch in iterator:
             text, labels = batch
-            
             text = text.to(device)
-            
+
             if is_binary:
                 labels = labels.float().to(device)
             else:
                 labels = labels.long().to(device)
-            
+
             predictions = model(text)
-            
+
             if is_binary:
                 predictions = predictions.squeeze(1)
-            
+
             loss = criterion(predictions, labels)
             acc = calculate_accuracy(predictions, labels, is_binary)
-            
+
             epoch_loss += loss.item()
             epoch_acc += acc.item()
-            
+
     return epoch_loss / len(iterator), epoch_acc / len(iterator)

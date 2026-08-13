@@ -1,19 +1,37 @@
-.venv/
+# Python Bytecode & Cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+
+# Environments & IDE Settings
+.venv/
+venv/
+env/
+ENV/
+.idea/
+.vscode/
+.DS_Store
+
+# Data & Model Checkpoints
 data/
 saved_models/
+*.pth
 
-# Latex
+# Execution Logs & Project Artifacts
+results.txt
+
+# LaTeX Compilation Artifacts (report/ & presentation/)
 *.aux
 *.bbl
 *.blg
-*.log
-*.out
-*.toc
-*.synctex.gz
 *.fdb_latexmk
 *.fls
+*.gz
+*.log
 *.nav
+*.out
 *.pdf
 *.snm
+*.synctex.gz
+*.toc
